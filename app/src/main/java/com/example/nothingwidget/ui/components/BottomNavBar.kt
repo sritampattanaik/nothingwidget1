@@ -40,7 +40,7 @@ fun BottomNavBar(navController: NavController, currentRoute: String) {
         BottomNavItem(
             icon = Icons.Default.Dashboard,
             isActive = currentRoute == "customize",
-            onClick = { navController.navigate("customize") }
+            onClick = { navController.navigate("customize/clock") }
         )
         BottomNavItem(
             icon = Icons.Default.Code,
