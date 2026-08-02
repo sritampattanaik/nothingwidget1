@@ -3,6 +3,7 @@ package com.example.nothingwidget.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -76,7 +77,7 @@ fun HomeScreen(navController: NavController) {
             ) {
                 // Card 1: Digital Clock (Full Width)
                 item(span = { GridItemSpan(2) }) {
-                    WidgetCard(title = "Digital Clock", sizeLabel = "4x2 SIZE") {
+                    WidgetCard(title = "Digital Clock", sizeLabel = "4x2 SIZE", modifier = Modifier.clickable { navController.navigate("customize/clock") }) {
                         var currentTime by remember { mutableStateOf(LocalTime.now()) }
                         var showDot by remember { mutableStateOf(true) }
 
@@ -120,7 +121,7 @@ fun HomeScreen(navController: NavController) {
 
                 // Card 2: Calendar
                 item {
-                    WidgetCard(title = "Calendar", sizeLabel = "2x2 SIZE", modifier = Modifier.aspectRatio(1f)) {
+                    WidgetCard(title = "Calendar", sizeLabel = "2x2 SIZE", modifier = Modifier.aspectRatio(1f).clickable { navController.navigate("customize/date") }) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -135,7 +136,7 @@ fun HomeScreen(navController: NavController) {
 
                 // Card 3: Weather Dot
                 item {
-                    WidgetCard(title = "Weather Dot", sizeLabel = "2x2 SIZE", modifier = Modifier.aspectRatio(1f)) {
+                    WidgetCard(title = "Weather Dot", sizeLabel = "2x2 SIZE", modifier = Modifier.aspectRatio(1f).clickable { navController.navigate("customize/weather") }) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Box(
                                 modifier = Modifier
@@ -158,7 +159,7 @@ fun HomeScreen(navController: NavController) {
 
                 // Card 4: Power Level (Full Width)
                 item(span = { GridItemSpan(2) }) {
-                    WidgetCard(title = "Power Level", sizeLabel = "2x1 SIZE") {
+                    WidgetCard(title = "Power Level", sizeLabel = "2x1 SIZE", modifier = Modifier.clickable { navController.navigate("customize/battery") }) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()

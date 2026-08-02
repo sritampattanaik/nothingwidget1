@@ -27,7 +27,10 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") { HomeScreen(navController) }
-                        composable("customize") { CustomizeScreen(navController) }
+                        composable("customize/{widgetType}") { backStackEntry ->
+                            val widgetType = backStackEntry.arguments?.getString("widgetType") ?: "clock"
+                            CustomizeScreen(navController = navController, widgetType = widgetType)
+                        }
                         composable("settings") { SettingsScreen(navController) }
                     }
                 }
