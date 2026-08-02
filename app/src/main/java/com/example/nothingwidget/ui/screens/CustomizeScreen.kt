@@ -40,6 +40,17 @@ fun CustomizeScreen(navController: NavController) {
     val context = LocalContext.current
     val appWidgetManager = AppWidgetManager.getInstance(context)
     val clockProvider = ComponentName(context, ClockWidget::class.java)
+    val prefs = context.getSharedPreferences("widget_prefs", android.content.Context.MODE_PRIVATE)
+
+    val selectedColorHex = when (activeColor) {
+        AccentRed -> "#FF5540"
+        MutedOutline -> "#8E9192"
+        else -> "#FFFFFF"
+    }
+
+    LaunchedEffect(activeColor) { prefs.edit().putString("clock_color", selectedColorHex).apply() }
+    LaunchedEffect(activeStyle) { prefs.edit().putString("clock_style", activeStyle).apply() }
+    LaunchedEffect(activeSize) { prefs.edit().putString("clock_size", activeSize).apply() }
 
     Scaffold(
         topBar = {
@@ -60,6 +71,27 @@ fun CustomizeScreen(navController: NavController) {
                         if (appWidgetManager.isRequestPinAppWidgetSupported) {
                             appWidgetManager.requestPinAppWidget(clockProvider, null, null)
                         }
+                        
+                        val updateIntentClock = android.content.Intent(context, ClockWidget::class.java).apply {
+                            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetManager.getAppWidgetIds(clockProvider))
+                        }
+                        context.sendBroadcast(updateIntentClock)
+
+                        val updateIntentDate = android.content.Intent(context, com.example.nothingwidget.widgets.DateWidget::class.java).apply {
+                            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                            val dateProvider = ComponentName(context, com.example.nothingwidget.widgets.DateWidget::class.java)
+                            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetManager.getAppWidgetIds(dateProvider))
+                        }
+                        context.sendBroadcast(updateIntentDate)
+
+                        val updateIntentBattery = android.content.Intent(context, com.example.nothingwidget.widgets.BatteryWidget::class.java).apply {
+                            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                            val batteryProvider = ComponentName(context, com.example.nothingwidget.widgets.BatteryWidget::class.java)
+                            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetManager.getAppWidgetIds(batteryProvider))
+                        }
+                        context.sendBroadcast(updateIntentBattery)
+
                         Toast.makeText(context, "Adding widget to home screen...", Toast.LENGTH_SHORT).show()
                     },
                 contentAlignment = Alignment.Center
@@ -83,10 +115,11 @@ fun CustomizeScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(4f / 3f)
+                    .wrapContentHeight()
+                    .animateContentSize()
                     .background(BackgroundColor)
                     .border(1.dp, SurfaceLowest, androidx.compose.ui.graphics.RectangleShape)
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 20.dp)
             ) {
                 Text(
                     text = "$activeSize Widget Mode",
@@ -110,28 +143,37 @@ fun CustomizeScreen(navController: NavController) {
                         .border(1.dp, PrimaryText, androidx.compose.ui.graphics.RectangleShape)
                         .background(BackgroundColor)
                         .animateContentSize()
-                        .padding(24.dp),
+                        .padding(24.dp)
+                        .wrapContentSize(unbounded = true),
                     contentAlignment = Alignment.Center
                 ) {
+                    val clockFontSize = when (activeSize) {
+                        "2x1" -> 28.sp
+                        "2x2" -> 44.sp
+                        "4x1" -> 32.sp
+                        "4x2" -> 58.sp
+                        else -> 44.sp
+                    }
+
                     val clockTextStyle = when (activeStyle) {
-                        "Bold" -> TextStyle(color = activeColor, fontWeight = FontWeight.Bold, fontSize = 56.sp)
+                        "Bold" -> TextStyle(color = activeColor, fontWeight = FontWeight.Bold, fontSize = (clockFontSize.value + 4f).sp)
                         "Outlined" -> TextStyle(
                             color = Color.Transparent,
                             drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
-                            fontSize = 48.sp,
+                            fontSize = clockFontSize,
                             fontWeight = FontWeight.Bold
                         )
-                        else -> TextStyle(color = activeColor, fontWeight = FontWeight.Normal, fontSize = 48.sp)
+                        else -> TextStyle(color = activeColor, fontWeight = FontWeight.Normal, fontSize = clockFontSize)
                     }
 
                     val dotStyle = when (activeStyle) {
                         "Outlined" -> TextStyle(
                             color = Color.Transparent,
                             drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
-                            fontSize = 48.sp,
+                            fontSize = clockFontSize,
                             fontWeight = FontWeight.Bold
                         )
-                        else -> TextStyle(color = AccentRed, fontSize = 48.sp)
+                        else -> TextStyle(color = AccentRed, fontSize = clockFontSize)
                     }
 
                     val currentTime = LocalTime.now()
