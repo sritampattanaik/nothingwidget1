@@ -1,5 +1,8 @@
 package com.example.nothingwidget.ui.screens
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
@@ -32,11 +35,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nothingwidget.ui.theme.*
+import com.example.nothingwidget.widgets.BatteryWidget
+import com.example.nothingwidget.widgets.ClockWidget
+import com.example.nothingwidget.widgets.DateWidget
+import com.example.nothingwidget.widgets.WeatherWidget
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomizeScreen(navController: NavController, widgetType: String = "clock") {
     val context = LocalContext.current
+    val appWidgetManager = AppWidgetManager.getInstance(context)
+    val prefs = context.getSharedPreferences("widget_prefs", android.content.Context.MODE_PRIVATE)
+    
     val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
 
@@ -98,7 +108,37 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     modifier = Modifier
                         .background(PrimaryText)
                         .clickable {
-                            // Saving prefs and broadcast logic is for commit 4
+                            prefs.edit()
+                                .putString("${widgetType}_color", selectedColor)
+                                .putString("${widgetType}_style", selectedStyle)
+                                .putString("${widgetType}_size", selectedSize)
+                                .putString("${widgetType}_font", selectedFont)
+                                .putString("${widgetType}_background", selectedBackground)
+                                .putString("${widgetType}_dateformat", selectedDateFormat)
+                                .putString("${widgetType}_display", selectedDisplay)
+                                .putString("${widgetType}_unit", selectedUnit)
+                                .apply()
+
+                            val widgetClass = when (widgetType) {
+                                "clock" -> ClockWidget::class.java
+                                "date" -> DateWidget::class.java
+                                "battery" -> BatteryWidget::class.java
+                                "weather" -> WeatherWidget::class.java
+                                else -> ClockWidget::class.java
+                            }
+                            
+                            val provider = ComponentName(context, widgetClass)
+                            if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                appWidgetManager.requestPinAppWidget(provider, null, null)
+                            }
+                            
+                            val ids = appWidgetManager.getAppWidgetIds(provider)
+                            val updateIntent = Intent(context, widgetClass).apply {
+                                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                            }
+                            context.sendBroadcast(updateIntent)
+                            
                             Toast.makeText(context, "Widget updated", Toast.LENGTH_SHORT).show()
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp)
