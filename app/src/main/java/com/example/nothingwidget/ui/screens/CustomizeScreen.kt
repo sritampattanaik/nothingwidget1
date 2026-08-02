@@ -20,12 +20,21 @@ import com.example.nothingwidget.ui.components.NothingTopAppBar
 import com.example.nothingwidget.ui.theme.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.example.nothingwidget.widgets.ClockWidget
 
 @Composable
 fun CustomizeScreen(navController: NavController) {
-    var activeSize by remember { mutableStateOf("2x1") }
+    var activeSize by remember { mutableStateOf("2x2") }
     var activeStyle by remember { mutableStateOf("Minimal") }
     var activeColor by remember { mutableStateOf(PrimaryText) }
+
+    val context = LocalContext.current
+    val appWidgetManager = AppWidgetManager.getInstance(context)
+    val clockProvider = ComponentName(context, ClockWidget::class.java)
 
     Scaffold(
         topBar = {
@@ -42,7 +51,12 @@ fun CustomizeScreen(navController: NavController) {
                     .height(64.dp)
                     .background(PrimaryText)
                     .border(1.dp, PrimaryText, androidx.compose.ui.graphics.RectangleShape)
-                    .clickable { /* TODO */ },
+                    .clickable {
+                        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                            appWidgetManager.requestPinAppWidget(clockProvider, null, null)
+                        }
+                        Toast.makeText(context, "Adding widget to home screen...", Toast.LENGTH_SHORT).show()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
