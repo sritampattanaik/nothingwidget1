@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/battery_text"
+        android:id="@+id/widget_battery_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="87%"

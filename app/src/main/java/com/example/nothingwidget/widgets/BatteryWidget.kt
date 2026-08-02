@@ -26,10 +26,20 @@ class BatteryWidget : AppWidgetProvider() {
             100
         }
 
+        val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+        val savedColor = prefs.getString("clock_color", "#FFFFFF") ?: "#FFFFFF"
+        val savedStyle = prefs.getString("clock_style", "Minimal") ?: "Minimal"
+
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_battery)
-            views.setTextViewText(R.id.battery_text, "$batteryPct%")
+            views.setTextViewText(R.id.widget_battery_text, "$batteryPct%")
             views.setProgressBar(R.id.battery_progress, 100, batteryPct, false)
+            
+            views.setTextColor(R.id.widget_battery_text, android.graphics.Color.parseColor(savedColor))
+            if (savedStyle == "Bold") {
+                views.setInt(R.id.widget_battery_text, "setTypeface", android.graphics.Typeface.BOLD)
+            }
+            
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
@@ -50,10 +60,20 @@ class BatteryWidget : AppWidgetProvider() {
             }
 
             if (batteryPct != -1) {
+                val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+                val savedColor = prefs.getString("clock_color", "#FFFFFF") ?: "#FFFFFF"
+                val savedStyle = prefs.getString("clock_style", "Minimal") ?: "Minimal"
+
                 for (appWidgetId in appWidgetIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_battery)
-                    views.setTextViewText(R.id.battery_text, "$batteryPct%")
+                    views.setTextViewText(R.id.widget_battery_text, "$batteryPct%")
                     views.setProgressBar(R.id.battery_progress, 100, batteryPct, false)
+                    
+                    views.setTextColor(R.id.widget_battery_text, android.graphics.Color.parseColor(savedColor))
+                    if (savedStyle == "Bold") {
+                        views.setInt(R.id.widget_battery_text, "setTypeface", android.graphics.Typeface.BOLD)
+                    }
+                    
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
             }
