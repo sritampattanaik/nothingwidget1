@@ -21,10 +21,6 @@ class ClockWidget : AppWidgetProvider() {
             
             views.setTextColor(R.id.widget_clock_text, android.graphics.Color.parseColor(savedColor))
             
-            if (savedStyle == "Bold") {
-                views.setInt(R.id.widget_clock_text, "setTypeface", android.graphics.Typeface.BOLD)
-            }
-            
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
