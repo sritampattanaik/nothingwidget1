@@ -507,10 +507,8 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
             
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.4f) // Restrict preview to the top 40% (above the 60% bottom sheet)
                     .align(Alignment.TopCenter)
-                    .padding(top = 32.dp)
+                    .padding(top = 80.dp)
                     .animateContentSize(),
                 contentAlignment = Alignment.Center
             ) {
