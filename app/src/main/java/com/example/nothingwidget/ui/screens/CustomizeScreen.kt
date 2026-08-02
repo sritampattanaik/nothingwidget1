@@ -1,8 +1,5 @@
 package com.example.nothingwidget.ui.screens
 
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
@@ -14,11 +11,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,9 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nothingwidget.ui.theme.*
-import com.example.nothingwidget.widgets.ClockWidget
-import com.example.nothingwidget.widgets.DateWidget
-import com.example.nothingwidget.widgets.BatteryWidget
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,11 +40,38 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
     val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
 
-    var selectedSize by remember { mutableStateOf("2x2") }
+    var selectedSize by remember { mutableStateOf(if (widgetType == "date") "4x2" else "2x2") }
     var selectedStyle by remember { mutableStateOf("BOLD") }
     var selectedColor by remember { mutableStateOf("#FFFFFF") }
     var selectedFont by remember { mutableStateOf("Space Mono") }
     var selectedBackground by remember { mutableStateOf("OUTLINED BOX") }
+    
+    var selectedDateFormat by remember { mutableStateOf("MON 28 JULY") }
+    var selectedDisplay by remember { mutableStateOf("BOTH") }
+    var selectedUnit by remember { mutableStateOf("°C") }
+
+    val screenTitle = when(widgetType) {
+        "clock" -> "DIGITAL CLOCK"
+        "date" -> "DATE WIDGET"
+        "battery" -> "BATTERY WIDGET"
+        "weather" -> "WEATHER WIDGET"
+        else -> "CUSTOMIZE"
+    }
+
+    val topLeftLabel = when(widgetType) {
+        "clock" -> "SYSTEM_TIME_LOCAL"
+        "date" -> "SYSTEM_DATE_LOCAL"
+        "battery" -> "POWER_LEVEL_SENSOR"
+        "weather" -> "WEATHER_API_LOCAL"
+        else -> "SYSTEM_LOCAL"
+    }
+
+    val topRightLabel = when(widgetType) {
+        "clock", "date" -> "SYNC_ACTIVE"
+        "battery" -> "READING_ACTIVE"
+        "weather" -> "FETCHING"
+        else -> "ACTIVE"
+    }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -67,7 +88,7 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = PrimaryText)
                 }
                 Text(
-                    text = "DIGITAL CLOCK",
+                    text = screenTitle,
                     color = PrimaryText,
                     fontFamily = SpaceMono,
                     fontWeight = FontWeight.Bold,
@@ -77,6 +98,7 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     modifier = Modifier
                         .background(PrimaryText)
                         .clickable {
+                            // Saving prefs and broadcast logic is for commit 4
                             Toast.makeText(context, "Widget updated", Toast.LENGTH_SHORT).show()
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -124,48 +146,46 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Section 2 - STYLE
-                Text("STYLE", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf("MINIMAL", "BOLD", "OUTLINED").forEach { style ->
-                        val isSelected = selectedStyle == style
-                        Box(
-                            modifier = Modifier
-                                .size(160.dp, 80.dp)
-                                .background(Color(0xFF1A1A1A))
-                                .border(if (isSelected) 2.dp else 1.dp, if (isSelected) Color.White else Color.Gray)
-                                .clickable { selectedStyle = style },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            val textStyle = when(style) {
-                                "BOLD" -> TextStyle(fontWeight = FontWeight.Black)
-                                "OUTLINED" -> TextStyle(
-                                    drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Transparent
+                if (widgetType == "clock") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("STYLE", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("MINIMAL", "BOLD", "OUTLINED").forEach { style ->
+                            val isSelected = selectedStyle == style
+                            Box(
+                                modifier = Modifier
+                                    .size(160.dp, 80.dp)
+                                    .background(Color(0xFF1A1A1A))
+                                    .border(if (isSelected) 2.dp else 1.dp, if (isSelected) Color.White else Color.Gray)
+                                    .clickable { selectedStyle = style },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val textStyle = when(style) {
+                                    "BOLD" -> TextStyle(fontWeight = FontWeight.Black)
+                                    "OUTLINED" -> TextStyle(
+                                        drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Transparent
+                                    )
+                                    else -> TextStyle(fontWeight = FontWeight.Normal)
+                                }
+                                Text(
+                                    text = style,
+                                    color = if (style == "OUTLINED") Color.Transparent else Color.White,
+                                    fontFamily = SpaceMono,
+                                    style = textStyle,
+                                    fontSize = 16.sp
                                 )
-                                else -> TextStyle(fontWeight = FontWeight.Normal)
                             }
-                            Text(
-                                text = style,
-                                color = if (style == "OUTLINED") Color.Transparent else Color.White,
-                                fontFamily = SpaceMono,
-                                style = textStyle,
-                                fontSize = 16.sp
-                            )
                         }
                     }
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))
-
-                // Section 3 - COLOR
                 Text("COLOR", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -196,43 +216,41 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Section 4 - FONT
-                Text("FONT", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val fonts = listOf(
-                        "Sans Thin" to (FontFamily.SansSerif to FontWeight.Light),
-                        "Sans Regular" to (FontFamily.SansSerif to FontWeight.Normal),
-                        "Space Mono" to (SpaceMono to FontWeight.Bold),
-                        "Serif" to (FontFamily.Serif to FontWeight.Normal),
-                        "Monospace" to (FontFamily.Monospace to FontWeight.Normal)
-                    )
-                    items(fonts) { (name, fontData) ->
-                        val isSelected = selectedFont == name
-                        Box(
-                            modifier = Modifier
-                                .size(100.dp, 72.dp)
-                                .background(Color(0xFF1A1A1A))
-                                .border(if (isSelected) 2.dp else 1.dp, if (isSelected) Color.White else Color.Gray)
-                                .clickable { selectedFont = name },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "22:47",
-                                color = Color.White,
-                                fontFamily = fontData.first,
-                                fontWeight = fontData.second,
-                                fontSize = 18.sp
-                            )
+                if (widgetType == "clock" || widgetType == "date" || widgetType == "weather") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("FONT", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val fonts = listOf(
+                            "Sans Thin" to (FontFamily.SansSerif to FontWeight.Light),
+                            "Sans Regular" to (FontFamily.SansSerif to FontWeight.Normal),
+                            "Space Mono" to (SpaceMono to FontWeight.Bold),
+                            "Serif" to (FontFamily.Serif to FontWeight.Normal),
+                            "Monospace" to (FontFamily.Monospace to FontWeight.Normal)
+                        )
+                        items(fonts) { (name, fontData) ->
+                            val isSelected = selectedFont == name
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp, 72.dp)
+                                    .background(Color(0xFF1A1A1A))
+                                    .border(if (isSelected) 2.dp else 1.dp, if (isSelected) Color.White else Color.Gray)
+                                    .clickable { selectedFont = name },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "22:47",
+                                    color = Color.White,
+                                    fontFamily = fontData.first,
+                                    fontWeight = fontData.second,
+                                    fontSize = 18.sp
+                                )
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
-
-                // Section 5 - BACKGROUND
                 Text("BACKGROUND", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -251,7 +269,6 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                             contentAlignment = Alignment.Center
                         ) {
                             if (bg == "TRANSPARENT") {
-                                // Checkerboard overlay representation could just be dots for now
                                 Canvas(modifier = Modifier.fillMaxSize()) {
                                     for (x in 0..size.width.toInt() step 20) {
                                         for (y in 0..size.height.toInt() step 20) {
@@ -261,6 +278,87 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                                 }
                             }
                             Text(text = bg, color = if (bg == "TRANSPARENT") Color.Gray else Color.White, fontFamily = SpaceMono, fontSize = 12.sp)
+                        }
+                    }
+                }
+
+                // Extra Sections
+                if (widgetType == "date") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("DATE FORMAT", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("MON 28 JULY", "28.07.2024", "MONDAY 28").forEach { fmt ->
+                            val isSelected = selectedDateFormat == fmt
+                            Box(
+                                modifier = Modifier
+                                    .height(52.dp)
+                                    .background(if (isSelected) Color.White else Color(0xFF2A2A2A))
+                                    .border(1.dp, if (isSelected) Color.Transparent else Color.White)
+                                    .clickable { selectedDateFormat = fmt }
+                                    .padding(horizontal = 24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = fmt,
+                                    color = if (isSelected) Color.Black else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontFamily = SpaceMono
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                if (widgetType == "battery") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("DISPLAY", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("PERCENTAGE ONLY", "BAR ONLY", "BOTH").forEach { display ->
+                            val isSelected = selectedDisplay == display
+                            Box(
+                                modifier = Modifier
+                                    .height(52.dp)
+                                    .background(if (isSelected) Color.White else Color(0xFF2A2A2A))
+                                    .border(1.dp, if (isSelected) Color.Transparent else Color.White)
+                                    .clickable { selectedDisplay = display }
+                                    .padding(horizontal = 24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = display,
+                                    color = if (isSelected) Color.Black else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontFamily = SpaceMono
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                if (widgetType == "weather") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("UNIT", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SpaceMono)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("°C", "°F").forEach { unit ->
+                            val isSelected = selectedUnit == unit
+                            Box(
+                                modifier = Modifier
+                                    .size(88.dp, 52.dp)
+                                    .background(if (isSelected) Color.White else Color(0xFF2A2A2A))
+                                    .border(1.dp, if (isSelected) Color.Transparent else Color.White)
+                                    .clickable { selectedUnit = unit },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = unit,
+                                    color = if (isSelected) Color.Black else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontFamily = SpaceMono
+                                )
+                            }
                         }
                     }
                 }
@@ -283,26 +381,28 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
                     }
                 )
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val dotSpacing = 8.dp.toPx()
-                val dotRadius = 1.dp.toPx()
-                for (x in 0..size.width.toInt() step dotSpacing.toInt()) {
-                    for (y in 0..size.height.toInt() step dotSpacing.toInt()) {
-                        drawCircle(
-                            color = Color.DarkGray.copy(alpha = 0.3f),
-                            radius = dotRadius,
-                            center = Offset(x.toFloat(), y.toFloat())
+            if (selectedBackground != "SOLID BLACK") {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val dotSpacing = 8.dp.toPx()
+                    val dotRadius = 1.dp.toPx()
+                    for (x in 0..size.width.toInt() step dotSpacing.toInt()) {
+                        for (y in 0..size.height.toInt() step dotSpacing.toInt()) {
+                            drawCircle(
+                                color = Color.DarkGray.copy(alpha = 0.3f),
+                                radius = dotRadius,
+                                center = Offset(x.toFloat(), y.toFloat())
+                            )
+                        }
+                    }
+                    val lineSpacing = 4.dp.toPx()
+                    for (y in 0..size.height.toInt() step lineSpacing.toInt()) {
+                        drawLine(
+                            color = Color.Black.copy(alpha = 0.2f),
+                            start = Offset(0f, y.toFloat()),
+                            end = Offset(size.width, y.toFloat()),
+                            strokeWidth = 1f
                         )
                     }
-                }
-                val lineSpacing = 4.dp.toPx()
-                for (y in 0..size.height.toInt() step lineSpacing.toInt()) {
-                    drawLine(
-                        color = Color.Black.copy(alpha = 0.2f),
-                        start = Offset(0f, y.toFloat()),
-                        end = Offset(size.width, y.toFloat()),
-                        strokeWidth = 1f
-                    )
                 }
             }
             
@@ -315,14 +415,14 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
             }
             
             Text(
-                text = "SYSTEM_TIME_LOCAL",
+                text = topLeftLabel,
                 color = Color.Gray,
                 fontFamily = SpaceMono,
                 fontSize = 10.sp,
                 modifier = Modifier.padding(16.dp).align(Alignment.TopStart)
             )
             Text(
-                text = "SYNC_ACTIVE",
+                text = topRightLabel,
                 color = AccentRed,
                 fontFamily = SpaceMono,
                 fontSize = 10.sp,
@@ -366,12 +466,56 @@ fun CustomizeScreen(navController: NavController, widgetType: String = "clock") 
             }
             
             Box(
-                modifier = Modifier.align(Alignment.Center).animateContentSize()
+                modifier = Modifier.align(Alignment.Center).animateContentSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "22:47",
-                    style = textStyle
-                )
+                when(widgetType) {
+                    "clock" -> {
+                        Text(text = "22:47", style = textStyle)
+                    }
+                    "date" -> {
+                        val text = when (selectedDateFormat) {
+                            "28.07.2024" -> "28.07.2024"
+                            "MONDAY 28" -> "MONDAY 28"
+                            else -> "MON · 28 JULY"
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = text, style = textStyle.copy(fontSize = baseFontSize / 1.5f))
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.White))
+                        }
+                    }
+                    "battery" -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (selectedDisplay == "PERCENTAGE ONLY" || selectedDisplay == "BOTH") {
+                                Text(text = "87%", style = textStyle)
+                            }
+                            if (selectedDisplay == "BAR ONLY" || selectedDisplay == "BOTH") {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .height(4.dp)
+                                        .background(Color(0xFF2A2A2A))
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.87f)
+                                            .height(4.dp)
+                                            .background(previewColor)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    "weather" -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.WbSunny, contentDescription = "Weather", tint = previewColor, modifier = Modifier.size(baseFontSize.value.dp))
+                            Text(text = if (selectedUnit == "°C") "24°" else "75°", style = textStyle)
+                            Text(text = "CLEAR SKY", color = Color.Gray, fontFamily = SpaceMono, fontSize = 14.sp)
+                        }
+                    }
+                }
             }
             
             Text(
