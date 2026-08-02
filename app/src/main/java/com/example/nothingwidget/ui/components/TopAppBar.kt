@@ -25,23 +25,27 @@ fun NothingTopAppBar(
     showBack: Boolean = false,
     onBack: () -> Unit = {}
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .background(BackgroundColor)
             .border(1.dp, PrimaryText, androidx.compose.ui.graphics.RectangleShape)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        if (showBack) {
-            IconButton(onClick = onBack, modifier = Modifier.size(24.dp)) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = PrimaryText)
+        Row(
+            modifier = Modifier
+                .fillMaxHeight()
+                .align(Alignment.CenterLeft)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (showBack) {
+                IconButton(onClick = onBack, modifier = Modifier.size(24.dp)) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = PrimaryText)
+                }
+            } else {
+                Icon(Icons.Default.GridView, contentDescription = "Grid", tint = PrimaryText, modifier = Modifier.size(24.dp))
             }
-            Spacer(modifier = Modifier.width(16.dp))
-        } else {
-            Icon(Icons.Default.GridView, contentDescription = "Grid", tint = PrimaryText, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(16.dp))
         }
 
         Text(
@@ -51,7 +55,7 @@ fun NothingTopAppBar(
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             letterSpacing = 2.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.align(Alignment.Center)
         )
     }
 }
