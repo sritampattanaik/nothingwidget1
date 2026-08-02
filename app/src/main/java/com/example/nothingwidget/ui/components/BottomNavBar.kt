@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material.icons.filled.Widgets
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,12 +38,12 @@ fun BottomNavBar(navController: NavController, currentRoute: String) {
             onClick = { navController.navigate("home") }
         )
         BottomNavItem(
-            icon = Icons.Default.Widgets,
+            icon = Icons.Default.Dashboard,
             isActive = currentRoute == "customize",
             onClick = { navController.navigate("customize") }
         )
         BottomNavItem(
-            icon = Icons.Default.Terminal,
+            icon = Icons.Default.Code,
             isActive = currentRoute == "terminal",
             onClick = {  }
         )
@@ -57,7 +57,7 @@ fun BottomNavBar(navController: NavController, currentRoute: String) {
 }
 
 @Composable
-fun BottomNavItem(
+fun RowScope.BottomNavItem(
     icon: ImageVector,
     isActive: Boolean,
     onClick: () -> Unit,

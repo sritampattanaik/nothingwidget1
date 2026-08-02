@@ -139,7 +139,7 @@ fun HomeScreen(navController: NavController) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Box(
                                 modifier = Modifier
-                                    .align(Alignment.TopRight)
+                                    .align(Alignment.TopEnd)
                                     .size(6.dp)
                                     .background(AccentRed)
                             )

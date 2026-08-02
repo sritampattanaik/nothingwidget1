@@ -35,7 +35,7 @@ fun NothingTopAppBar(
         Row(
             modifier = Modifier
                 .fillMaxHeight()
-                .align(Alignment.CenterLeft)
+                .align(Alignment.CenterStart)
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

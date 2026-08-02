@@ -73,7 +73,7 @@ fun CustomizeScreen(navController: NavController) {
                     text = "$activeSize Widget Mode",
                     color = MutedOutline,
                     style = Typography.labelSmall,
-                    modifier = Modifier.align(Alignment.TopLeft)
+                    modifier = Modifier.align(Alignment.TopStart)
                 )
 
                 // The Widget Canvas
@@ -110,7 +110,7 @@ fun CustomizeScreen(navController: NavController) {
 
                 // Two small white squares bottom right
                 Row(
-                    modifier = Modifier.align(Alignment.BottomRight),
+                    modifier = Modifier.align(Alignment.BottomEnd),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Box(modifier = Modifier.size(6.dp).background(PrimaryText))
