@@ -23,7 +23,12 @@ import java.time.format.DateTimeFormatter
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeJoin
 import com.example.nothingwidget.widgets.ClockWidget
 
 @Composable
@@ -91,33 +96,61 @@ fun CustomizeScreen(navController: NavController) {
                 )
 
                 // The Widget Canvas
+                val (canvasWidth, canvasHeight) = when (activeSize) {
+                    "2x1" -> 180.dp to 90.dp
+                    "2x2" -> 180.dp to 180.dp
+                    "4x1" -> 360.dp to 90.dp
+                    "4x2" -> 360.dp to 180.dp
+                    else -> 180.dp to 90.dp
+                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.Center)
+                        .size(width = canvasWidth, height = canvasHeight)
                         .border(1.dp, PrimaryText, androidx.compose.ui.graphics.RectangleShape)
+                        .background(BackgroundColor)
+                        .animateContentSize()
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
+                    val clockTextStyle = when (activeStyle) {
+                        "Bold" -> TextStyle(color = activeColor, fontWeight = FontWeight.Bold, fontSize = 56.sp)
+                        "Outlined" -> TextStyle(
+                            color = Color.Transparent,
+                            drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        else -> TextStyle(color = activeColor, fontWeight = FontWeight.Normal, fontSize = 48.sp)
+                    }
+
+                    val dotStyle = when (activeStyle) {
+                        "Outlined" -> TextStyle(
+                            color = Color.Transparent,
+                            drawStyle = Stroke(miter = 10f, width = 4f, join = StrokeJoin.Round),
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        else -> TextStyle(color = AccentRed, fontSize = 48.sp)
+                    }
+
                     val currentTime = LocalTime.now()
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = currentTime.format(DateTimeFormatter.ofPattern("HH")),
-                            fontSize = 48.sp,
                             fontFamily = SpaceMono,
-                            color = activeColor
+                            style = clockTextStyle
                         )
                         Text(
                             text = "·",
-                            fontSize = 48.sp,
                             fontFamily = SpaceMono,
-                            color = AccentRed,
+                            style = dotStyle,
                             modifier = Modifier.padding(horizontal = 4.dp)
                         )
                         Text(
                             text = currentTime.format(DateTimeFormatter.ofPattern("mm")),
-                            fontSize = 48.sp,
                             fontFamily = SpaceMono,
-                            color = activeColor
+                            style = clockTextStyle
                         )
                     }
                 }
