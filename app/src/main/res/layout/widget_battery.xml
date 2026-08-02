@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#141313"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/battery_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="87%"
+        android:gravity="right"
+        android:fontFamily="@font/space_mono_bold"
+        android:textColor="#FFFFFF"
+        android:textSize="36sp" />
+
+    <ProgressBar
+        android:id="@+id/battery_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        android:progress="87"
+        android:progressTint="#FFFFFF"
+        android:progressBackgroundTint="#201F1F" />
+
+</LinearLayout>

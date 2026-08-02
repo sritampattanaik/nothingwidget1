@@ -45,6 +45,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_date_info" />
         </receiver>
+
+        <receiver
+            android:name=".widgets.BatteryWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BATTERY_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_battery_info" />
+        </receiver>
     </application>
 
 </manifest>
