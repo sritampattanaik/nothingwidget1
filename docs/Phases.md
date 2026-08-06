@@ -202,13 +202,11 @@ After
 adb shell reboot
 , all widgets are present and showing correct data within 60s
 Battery widget shows correct % matching Android status bar
-Phase 3 — Settings Persistence
+## Phase 3 — Settings Persistence (✅ DONE)
 Objective: Make the Settings screen actually save and apply settings. 
 Est. time: 1–2 days
 Tasks
-SettingsViewModel
- reads/writes 
-AppPreferencesDataStore
+SettingsViewModel reads/writes AppPreferencesDataStore
 "WIDGET REFRESH RATE" selection actually persists and is read by WorkManager interval
 "DOT-MATRIX INTENSITY" slider persists and affects the Canvas in CustomizeScreen
 "THEME" selection persists (dark only for now, extended in Phase 5)

@@ -30,6 +30,26 @@ class SettingsViewModel(
                 _state.value = _state.value.copy(isDarkTheme = isDark)
             }
         }
+        viewModelScope.launch {
+            appPreferencesRepository.isHapticFeedbackFlow.collect { isHaptic ->
+                _state.value = _state.value.copy(isHapticFeedbackEnabled = isHaptic)
+            }
+        }
+        viewModelScope.launch {
+            appPreferencesRepository.is24HourClockFlow.collect { is24h ->
+                _state.value = _state.value.copy(is24HourClock = is24h)
+            }
+        }
+        viewModelScope.launch {
+            appPreferencesRepository.isCelsiusFlow.collect { isCelsius ->
+                _state.value = _state.value.copy(isCelsius = isCelsius)
+            }
+        }
+        viewModelScope.launch {
+            appPreferencesRepository.selectedCityFlow.collect { city ->
+                _state.value = _state.value.copy(selectedCity = city)
+            }
+        }
     }
 
     fun toggleTheme() {
@@ -39,15 +59,21 @@ class SettingsViewModel(
     }
 
     fun toggleHaptics() {
-        _state.value = _state.value.copy(isHapticFeedbackEnabled = !_state.value.isHapticFeedbackEnabled)
+        viewModelScope.launch {
+            appPreferencesRepository.setHapticFeedback(!_state.value.isHapticFeedbackEnabled)
+        }
     }
 
     fun toggle24h() {
-        _state.value = _state.value.copy(is24HourClock = !_state.value.is24HourClock)
+        viewModelScope.launch {
+            appPreferencesRepository.set24HourClock(!_state.value.is24HourClock)
+        }
     }
 
     fun toggleCelsius() {
-        _state.value = _state.value.copy(isCelsius = !_state.value.isCelsius)
+        viewModelScope.launch {
+            appPreferencesRepository.setCelsius(!_state.value.isCelsius)
+        }
     }
 
     fun setUpdateInterval(mins: Int) {
@@ -55,6 +81,8 @@ class SettingsViewModel(
     }
 
     fun setSelectedCity(city: String) {
-        _state.value = _state.value.copy(selectedCity = city)
+        viewModelScope.launch {
+            appPreferencesRepository.setSelectedCity(city)
+        }
     }
 }
