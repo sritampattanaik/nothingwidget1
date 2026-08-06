@@ -25,8 +25,7 @@ class ClockWidget : AppWidgetProvider() {
             try {
                 val db = AppDatabase.getInstance(context)
                 val repo = WidgetRepository(db.widgetConfigDao())
-                val configs = repo.allConfigs.first()
-                val clockConfig = configs.find { it.type == WidgetType.DIGITAL_CLOCK }
+                val clockConfig = repo.getConfigById("clock_digital_default")
                 
                 // Parse color from config, fallback to white if not found
                 val colorHex = clockConfig?.accentColorHex ?: "#FFFFFF"

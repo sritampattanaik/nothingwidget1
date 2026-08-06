@@ -22,8 +22,7 @@ class WeatherWidget : AppWidgetProvider() {
             try {
                 val db = AppDatabase.getInstance(context)
                 val repo = WidgetRepository(db.widgetConfigDao())
-                val configs = repo.allConfigs.first()
-                val weatherConfig = configs.find { it.type == WidgetType.WEATHER }
+                val weatherConfig = repo.getConfigById("weather_default")
                 
                 // Parse color from config, fallback to white if not found
                 val colorHex = weatherConfig?.accentColorHex ?: "#FFFFFF"

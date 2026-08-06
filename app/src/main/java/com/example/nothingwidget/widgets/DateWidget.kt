@@ -22,8 +22,7 @@ class DateWidget : AppWidgetProvider() {
             try {
                 val db = AppDatabase.getInstance(context)
                 val repo = WidgetRepository(db.widgetConfigDao())
-                val configs = repo.allConfigs.first()
-                val dateConfig = configs.find { it.type == WidgetType.DATE }
+                val dateConfig = repo.getConfigById("date_default")
                 
                 // Parse color from config, fallback to white if not found
                 val colorHex = dateConfig?.accentColorHex ?: "#FFFFFF"
