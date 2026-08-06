@@ -21,7 +21,7 @@ class WeatherWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_weather)
             
             views.setTextColor(R.id.widget_weather_temp, Color.parseColor(savedColor))
-            views.setTextViewText(R.id.widget_weather_temp, if (savedUnit == "°C") "24°" else "75°")
+            views.setTextViewText(R.id.widget_weather_temp, if (savedUnit == "°C") "--°" else "--°")
             
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
