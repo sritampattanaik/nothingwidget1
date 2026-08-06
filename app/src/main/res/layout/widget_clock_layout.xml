@@ -8,21 +8,24 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <TextClock
         android:id="@+id/widget_clock_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12:45"
+        android:format12Hour="HH:mm"
+        android:format24Hour="HH:mm"
         android:textColor="#FFFFFF"
         android:textSize="32sp"
         android:textStyle="bold" />
 
-    <TextView
+    <TextClock
         android:id="@+id/widget_clock_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="MON, AUG 4"
+        android:format12Hour="EEE, MMM d"
+        android:format24Hour="EEE, MMM d"
+        android:textAllCaps="true"
         android:textColor="#D71921"
         android:textSize="12sp"
         android:textStyle="bold" />

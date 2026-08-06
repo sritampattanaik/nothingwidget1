@@ -130,13 +130,14 @@ The following critical state management and persistence bugs were identified and
 1. **Widget Overwrite Bug (Bug 1)**: Fixed an issue in `WidgetRepository.allConfigs` where saving a single customized widget to the Room database would cause all other unedited preset widgets to disappear from the gallery. The repository now correctly merges default presets with saved entities using `associateBy { it.id }`.
 2. **Missing Widgets on App Restart (Bug 2)**: Resolved by the same `WidgetRepository` fix. Since the initial database is empty on a fresh install or restart (if no edits were made), the repository now correctly falls back to generating the default preset list instead of returning an empty list.
 3. **Step Tracker Flow Bug**: Fixed an issue in `StepTrackerRepository` where calling `incrementSteps()` attempted to synchronously evaluate a Room database `Flow`, resulting in broken step increment logic. Introduced `getStepsForDateSync()` in `StepDao` to correctly read the current step state.
+4. **Direct Widget Pinning Fix**: Updated the pinning logic in `WidgetGalleryScreen.kt` (`requestPinWidget`) to pass the explicit `Class<*>` via `Class.forName()` to `ComponentName`, fixing a bug where Android's native pinning flow was failing to trigger or bypassing the direct pin overlay.
 
 ### Definition of Done
 App compiles with Hilt, no SharedPreferences anywhere
 Each screen observes ViewModel StateFlow
 Navigation uses typed routes
 No business logic inside any Composable
-Phase 2 — Widget Engine
+## Phase 2 — Widget Engine (✅ DONE)
 Objective: Make widgets actually work reliably — correct data, correct update timing, survive reboot. 
 Est. time: 3–5 days
 Tasks

@@ -3,27 +3,43 @@ package com.example.nothingwidget.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.graphics.Color
 import android.widget.RemoteViews
 import com.example.nothingwidget.R
-import android.graphics.Color
+import com.example.nothingwidget.data.local.AppDatabase
+import com.example.nothingwidget.data.repository.WidgetRepository
+import com.example.nothingwidget.domain.model.WidgetType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class WeatherWidget : AppWidgetProvider() {
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
-    ) {
-        val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
-        val savedColor = prefs.getString("weather_color", "#FFFFFF") ?: "#FFFFFF"
-        val savedUnit = prefs.getString("weather_unit", "°C") ?: "°C"
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        val pendingResult = goAsync()
         
-        for (appWidgetId in appWidgetIds) {
-            val views = RemoteViews(context.packageName, R.layout.widget_weather)
-            
-            views.setTextColor(R.id.widget_weather_temp, Color.parseColor(savedColor))
-            views.setTextViewText(R.id.widget_weather_temp, if (savedUnit == "°C") "--°" else "--°")
-            
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val db = AppDatabase.getInstance(context)
+                val repo = WidgetRepository(db.widgetConfigDao())
+                val configs = repo.allConfigs.first()
+                val weatherConfig = configs.find { it.type == WidgetType.WEATHER }
+                
+                // Parse color from config, fallback to white if not found
+                val colorHex = weatherConfig?.accentColorHex ?: "#FFFFFF"
+                val parsedColor = try { Color.parseColor(colorHex) } catch (e: Exception) { Color.WHITE }
+
+                for (appWidgetId in appWidgetIds) {
+                    val views = RemoteViews(context.packageName, R.layout.widget_weather)
+                    
+                    views.setTextColor(R.id.widget_weather_temp, parsedColor)
+                    views.setTextViewText(R.id.widget_weather_temp, "--°")
+                    
+                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                }
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 }

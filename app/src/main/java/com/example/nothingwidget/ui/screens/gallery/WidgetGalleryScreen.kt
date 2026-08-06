@@ -345,25 +345,24 @@ fun GalleryWidgetCardItem(
 fun requestPinWidget(context: Context, config: NothingWidgetConfig) {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val providerClassName = when (config.type) {
-            WidgetType.DIGITAL_CLOCK, WidgetType.ANALOG_CLOCK, WidgetType.WORLD_CLOCK -> "com.example.nothingwidget.widgets.ClockWidget"
-            WidgetType.WEATHER -> "com.example.nothingwidget.widgets.WeatherWidget"
-            WidgetType.BATTERY_CIRCLE -> "com.example.nothingwidget.widgets.BatteryWidget"
-            WidgetType.QUICK_TOGGLES -> "com.example.nothingwidget.widgets.QuickSettingsWidget" // Does not exist yet, using a stub name
-            WidgetType.STEP_TRACKER -> "com.example.nothingwidget.widgets.StepWidget"
-            WidgetType.AUDIO_PLAYER -> "com.example.nothingwidget.widgets.AudioWidget"
-            WidgetType.QUICK_NOTE -> "com.example.nothingwidget.widgets.ClockWidget" // Fallback
-            WidgetType.DATE -> "com.example.nothingwidget.widgets.DateWidget"
+        val providerClass = when (config.type) {
+            WidgetType.DIGITAL_CLOCK, WidgetType.ANALOG_CLOCK, WidgetType.WORLD_CLOCK -> Class.forName("com.example.nothingwidget.widgets.ClockWidget")
+            WidgetType.WEATHER -> Class.forName("com.example.nothingwidget.widgets.WeatherWidget")
+            WidgetType.BATTERY_CIRCLE -> Class.forName("com.example.nothingwidget.widgets.BatteryWidget")
+            WidgetType.QUICK_TOGGLES -> Class.forName("com.example.nothingwidget.widget.NothingQuickSettingsWidgetProvider")
+            WidgetType.STEP_TRACKER -> Class.forName("com.example.nothingwidget.widget.NothingStepWidgetProvider")
+            WidgetType.AUDIO_PLAYER -> Class.forName("com.example.nothingwidget.widget.NothingAudioWidgetProvider")
+            WidgetType.QUICK_NOTE -> Class.forName("com.example.nothingwidget.widgets.ClockWidget") // Fallback
+            WidgetType.DATE -> Class.forName("com.example.nothingwidget.widgets.DateWidget")
         }
 
-        val myProvider = ComponentName(context, providerClassName)
+        val myProvider = ComponentName(context, providerClass)
         if (appWidgetManager.isRequestPinAppWidgetSupported) {
             appWidgetManager.requestPinAppWidget(myProvider, null, null)
-            Toast.makeText(context, "Adding ${config.title} to Home Screen...", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(context, "Pinned to Nothing Widget presets!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Auto-pin not supported on this launcher", Toast.LENGTH_SHORT).show()
         }
     } else {
-        Toast.makeText(context, "Pinned to Nothing Widget presets!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Auto-pin not supported on this launcher", Toast.LENGTH_SHORT).show()
     }
 }

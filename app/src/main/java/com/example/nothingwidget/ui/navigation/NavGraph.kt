@@ -34,7 +34,7 @@ fun AppNavGraph(navController: NavHostController) {
     val db = remember { AppDatabase.getInstance(context) }
     val widgetRepo = remember { WidgetRepository(db.widgetConfigDao()) }
     val weatherRepo = remember { WeatherRepository() }
-    val batteryRepo = remember { BatteryRepository() }
+    val batteryRepo = remember { BatteryRepository(context) }
     val quickSettingsRepo = remember { QuickSettingsRepository() }
     val stepRepo = remember { StepTrackerRepository(db.stepDao()) }
     val audioRepo = remember { AudioRepository() }
