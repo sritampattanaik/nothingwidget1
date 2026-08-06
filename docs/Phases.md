@@ -216,19 +216,14 @@ Settings screen no longer shows "ONLINE" / "DEVICE STATUS" hardcoded hero — re
 Definition of Done
 Killing and relaunching the app shows the same Settings values
 Refresh rate change reflects in actual WorkManager periodic interval
-Phase 4 — Home Screen Polish
+## Phase 4 — Home Screen Polish (✅ DONE)
 Objective: Make the Home/Gallery screen show real live data previews, not hardcoded values. 
 Est. time: 2 days
 Tasks
-Clock card preview: already uses 
-LaunchedEffect + delay(500)
- ✅ — keep this
-Date card preview: hardcoded "MON 28 JULY" → replace with 
-LocalDate.now()
- formatted
-Battery card preview: hardcoded "87%" → replace with real battery level via 
-BatteryRepository
-Weather card preview: hardcoded "CLEAR SKY" → show placeholder "-- °" until data available
+Clock card preview: already uses `LaunchedEffect + delay(500)` ✅ — keep this
+Date card preview: hardcoded "MON 28 JULY" -> replace with `LocalDate.now()` formatted
+Battery card preview: hardcoded "87%" -> replace with real battery level via `BatteryRepository`
+Weather card preview: hardcoded "CLEAR SKY" -> show placeholder "-- °" until data available
 FAB ("+" button): implement — navigate to a widget picker or show a bottom sheet for choosing which widget to add
 "FIRMWARE_V2.0.4 / DOWNLOAD" row at bottom — remove (decorative, confusing to users)
 Definition of Done
