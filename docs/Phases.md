@@ -230,27 +230,18 @@ Definition of Done
 Every widget card on Home screen shows live data
 No hardcoded date/percentage visible to user
 FAB does something useful
-Phase 5 — Customization Persistence & Apply
+## Phase 5 — Customization Persistence & Apply (✅ DONE)
 Objective: Make the Customize screen actually save settings and apply them to real widgets. 
 Est. time: 2–3 days
 Tasks
-CustomizeViewModel.loadConfig(widgetType)
- reads from DataStore on screen entry
+CustomizeViewModel.loadConfig(widgetType) reads from DataStore on screen entry
 All option selectors (size, style, color, font, background) update ViewModel state
 Live preview reacts to ViewModel state changes (already visually OK — just needs to read from VM)
-"ADD" button → 
-viewModel.applyToWidget()
-:
+"ADD" button -> `viewModel.applyToWidget()`:
 Saves to DataStore
-Calls 
-AppWidgetManager.updateAppWidget()
- with new RemoteViews built from saved config
-If 
-requestPinAppWidget
- succeeds → toast "Widget added to home screen"
-If 
-requestPinAppWidget
- not supported → show a dialog: "Long-press your home screen → Widgets → NothingWidget → [widget name]"
+Calls `AppWidgetManager.updateAppWidget()` with new RemoteViews built from saved config
+If `requestPinAppWidget` succeeds -> toast "Widget added to home screen"
+If `requestPinAppWidget` not supported -> show a dialog: "Long-press your home screen -> Widgets -> NothingWidget -> [widget name]"
 Settings per widget must be keyed by 
 appWidgetId
  (Int), not just 

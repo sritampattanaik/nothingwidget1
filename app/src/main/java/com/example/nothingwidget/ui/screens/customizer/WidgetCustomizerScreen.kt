@@ -62,6 +62,8 @@ fun WidgetCustomizerScreen(
         viewModel.loadWidget(widgetId)
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     val configState by viewModel.config.collectAsStateWithLifecycle()
     val config = configState
 
@@ -242,6 +244,7 @@ fun WidgetCustomizerScreen(
                 Button(
                     onClick = {
                         viewModel.saveConfig {
+                            triggerWidgetUpdate(context, config.type)
                             onBackClick()
                         }
                     },
@@ -266,6 +269,36 @@ fun WidgetCustomizerScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
+        }
+    }
+}
+
+fun triggerWidgetUpdate(context: android.content.Context, type: com.example.nothingwidget.domain.model.WidgetType) {
+    val providerClass = when (type) {
+        com.example.nothingwidget.domain.model.WidgetType.DIGITAL_CLOCK, 
+        com.example.nothingwidget.domain.model.WidgetType.ANALOG_CLOCK, 
+        com.example.nothingwidget.domain.model.WidgetType.WORLD_CLOCK -> 
+            try { Class.forName("com.example.nothingwidget.widgets.ClockWidget") } catch (e: Exception) { null }
+        com.example.nothingwidget.domain.model.WidgetType.WEATHER -> 
+            try { Class.forName("com.example.nothingwidget.widgets.WeatherWidget") } catch (e: Exception) { null }
+        com.example.nothingwidget.domain.model.WidgetType.BATTERY_CIRCLE -> 
+            try { Class.forName("com.example.nothingwidget.widgets.BatteryWidget") } catch (e: Exception) { null }
+        com.example.nothingwidget.domain.model.WidgetType.DATE -> 
+            try { Class.forName("com.example.nothingwidget.widgets.DateWidget") } catch (e: Exception) { null }
+        else -> null
+    }
+
+    if (providerClass != null) {
+        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+        val componentName = android.content.ComponentName(context, providerClass)
+        val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        
+        if (appWidgetIds.isNotEmpty()) {
+            val intent = android.content.Intent(context, providerClass).apply {
+                action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+            }
+            context.sendBroadcast(intent)
         }
     }
 }
